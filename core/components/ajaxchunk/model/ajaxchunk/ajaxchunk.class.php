@@ -105,7 +105,7 @@ class ajaxChunk
 			'assets_js' => $this->config['assetsUrl'],
 			'connector_url' => $this->config['connectorUrl'],
 			'storage'=>array(),
-			'lang'=>array('notavail'=>$this->modx->lexicon('ac.notavail');)
+			'lang'=>array('notavail'=>$this->modx->lexicon('ac.notavail'))
 		);
         $this->modx->regClientStartupHTMLBlock
         (
