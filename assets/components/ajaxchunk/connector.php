@@ -23,6 +23,7 @@ if(file_exists($collections_cp))
 if(is_numeric($_POST['resource']))$modx->resource = $modx->getObject('modResource',(int)$_POST['resource'],false);
 $modx->initialize( 'web' );
 $modx->invokeEvent("OnLoadWebDocument");
+$modx->lexicon->load($modx->getOption('cultureKey').':core:default');
 
 $result = array();
 $result['timestamp'] = (int)$_POST['timestamp'];
