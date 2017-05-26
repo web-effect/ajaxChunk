@@ -14,13 +14,14 @@ class ajaxChunk
 		$assetsPath = $this->modx->getOption('ajaxchunk.assets_path', $config, $this->modx->getOption('assets_path') . 'components/ajaxchunk/');
 		$assetsUrl = $this->modx->getOption('ajaxchunk.assets_url', $config, $this->modx->getOption('assets_url') . 'components/ajaxchunk/');
 		$connectorUrl = $assetsUrl . 'connector.php';
+		$context_path = $this->modx->context->get('key')=='mgr'?'mgr':'web';
 
 		$this->config = array_merge(array(
 			'assetsUrl' => $assetsUrl,
-			'cssUrl' => $assetsUrl . $this->modx->context->get('key') . '/css/',
-			'jsUrl' => $assetsUrl . $this->modx->context->get('key') . '/js/',
-			'jsPath' => $assetsPath . $this->modx->context->get('key') . '/js/',
-			'imagesUrl' => $assetsUrl . $this->modx->context->get('key') . '/img/',
+			'cssUrl' => $assetsUrl . $context_path . '/css/',
+			'jsUrl' => $assetsUrl . $context_path . '/js/',
+			'jsPath' => $assetsPath . $context_path . '/js/',
+			'imagesUrl' => $assetsUrl . $context_path . '/img/',
 			'connectorUrl' => $connectorUrl,
 			'corePath' => $corePath,
 			'modelPath' => $corePath . 'model/',
