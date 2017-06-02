@@ -48,30 +48,16 @@ ajaxchunk.load = function(name,trying)
 		success:function(response,textStatus,jqXHR)
 		{
 			if(response.timestamp!==ajaxchunk.storage[name].config.timestamp)return;
-			if(response.success)
-			{
-				chunk.html(response.content);
-			}
-			else
-			{
-				chunk.html(response.message);
-			}
+			onSuccess = ajaxchunk.getCallback('onSuccess',name);
+			if(onSuccess)onSuccess(chunk,response);
 			chunk.removeClass('loading');
-			if(ajaxchunk.storage[name].config.afterLoad!==undefined && ajaxchunk.storage[name].config.afterLoad!=='')
-			{
-				if(typeof(ajaxchunk.storage[name].config.afterLoad)==='function')
-				{
-					ajaxchunk.storage[name].config.afterLoad(chunk,name,ajaxchunk.storage[name]);
-				}
-				else if(typeof(window[ajaxchunk.storage[name].config.afterLoad])==='function')
-				{
-					window[ajaxchunk.storage[name].config.afterLoad](chunk,name,ajaxchunk.storage[name]);
-				}
-			}
+			afterLoad = ajaxchunk.getCallback('afterLoad',name);
+			if(afterLoad)afterLoad(chunk,name,ajaxchunk.storage[name]);
 		},
 		error:function(jqXHR,textStatus,errorThrown)
 		{
-			if(trying<5){
+			if(trying<5)
+			{
 				trying += 1;
 				ajaxchunk.load(name,trying);
 			}
@@ -84,4 +70,18 @@ ajaxchunk.load = function(name,trying)
 		},
 		dataType:'json'
 	});
+};
+ajaxchunk.onSuccess = function(chunk,response)
+{
+	if(response.success) chunk.html(response.content);
+	else chunk.html(response.message);
+};
+ajaxchunk.getCallback=function(callback,name)
+{
+	var defaultCallback = false;
+	var userCallback = false;
+	if(typeof(ajaxchunk[callback])==='function')defaultCallback=ajaxchunk[callback];
+	if(typeof(ajaxchunk.storage[name].config[callback])==='function')userCallback=ajaxchunk.storage[name].config[callback];
+	else if(typeof(window[ajaxchunk.storage[name].config[callback]])==='function')userCallback=window[ajaxchunk.storage[name].config[callback]];
+	return userCallback?userCallback:defaultCallback;
 };
