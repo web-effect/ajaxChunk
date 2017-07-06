@@ -19,15 +19,11 @@ if(file_exists($collections_cp))
 	require_once $collections_cp.'model/collections/selectioncontainer.class.php';
 }
 
-if($_POST['resource'])
-{
-    $modx->resource = $modx->getObject('modResource',(int)$_POST['resource']);
-}
+if($_POST['resource']){$modx->resource = $modx->getObject('modResource',(int)$_POST['resource'],false);}
 $modx->initialize( 'web' );
 $modx->invokeEvent("OnLoadWebDocument");
 $modx->lexicon->load($modx->getOption('cultureKey').':core:default');
-if($modx->resource)
-{
+if($modx->resource){
 	$q_var = $modx->getOption('request_param_alias', null, 'q');
 	$_REQUEST[$q_var]=$modx->makeUrl($modx->resource->id);
 	if($tvs=$modx->resource->getMany('TemplateVars', 'all')){
@@ -45,31 +41,23 @@ if($modx->resource)
 
 $result = array();
 $result['timestamp'] = (int)$_POST['timestamp'];
-if(!isset($_POST['ajaxchunk_name']))
-{
+if(!isset($_POST['ajaxchunk_name'])){
     $result['success'] = false;
-    $result['error'] = 'FFFFUUUUUUUUUUUUUUUUUU! identifier missed';
-}
-elseif(!isset($_SESSION['ajaxchunk_'.$_POST['ajaxchunk_name']]))
-{
+    $result['error'] = 'Identifer missed.';
+}elseif(!isset($_SESSION['ajaxchunk_'.$_POST['ajaxchunk_name']])){
     $result['success'] = false;
-    $result['error'] = 'FFFFUUUUUUUUUUUUUUUUUU! identifier is wrong';
-}
-else
-{
+    $result['error'] = 'Indetifer not inited';
+}else{
     $result['success'] = true;
     $scriptProperties = $_SESSION['ajaxchunk_'.$_POST['ajaxchunk_name']];
     
     $ajaxChunk = $modx->getService('ajaxChunk','ajaxChunk',MODX_CORE_PATH.'components/ajaxchunk/model/ajaxchunk/');
     $ajaxChunk->initialize($scriptProperties);
 
-    if($ajaxChunk->hasErrors)
-    {
+    if($ajaxChunk->hasErrors){
         $result['success'] = false;
         $result['error'] = $ajaxChunk->getErrors();
-    }
-    else
-    {
+    }else{
         $result['content'] = $ajaxChunk->getContent();
     }
 }
