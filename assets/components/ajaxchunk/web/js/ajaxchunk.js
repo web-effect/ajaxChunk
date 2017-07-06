@@ -13,13 +13,16 @@ ajaxchunk.addData = function(name,data)
 		if(data[key]===null)
 		{
 			delete(ajaxchunk.storage[name].data[key]);
+			if(ajaxchunk.storage[name].formdata instanceof FormData)ajaxchunk.storage[name].formdata.delete(key);
 			continue;
 		}
 		ajaxchunk.storage[name].data[key] = data[key];
+		if(ajaxchunk.storage[name].formdata instanceof FormData)ajaxchunk.storage[name].formdata.set(key,data[key]);
 	}
 };
 ajaxchunk.load = function(name,trying)
 {
+	ajaxchunk.call('beforeLoad',name,[name]);
 	trying = trying||0;
 	var processData = true;
 	var contentType = 'application/x-www-form-urlencoded; charset=UTF-8';
@@ -48,11 +51,9 @@ ajaxchunk.load = function(name,trying)
 		success:function(response,textStatus,jqXHR)
 		{
 			if(response.timestamp!==ajaxchunk.storage[name].config.timestamp)return;
-			onSuccess = ajaxchunk.getCallback('onSuccess',name);
-			if(onSuccess)onSuccess(chunk,response);
+			ajaxchunk.call('onSuccess',name,[chunk,response,ajaxchunk.storage[name]]);
 			chunk.removeClass('loading');
-			afterLoad = ajaxchunk.getCallback('afterLoad',name);
-			if(afterLoad)afterLoad(chunk,name,ajaxchunk.storage[name]);
+			ajaxchunk.call('afterLoad',name,[chunk,name,ajaxchunk.storage[name]]);
 		},
 		error:function(jqXHR,textStatus,errorThrown)
 		{
@@ -84,4 +85,8 @@ ajaxchunk.getCallback=function(callback,name)
 	if(typeof(ajaxchunk.storage[name].config[callback])==='function')userCallback=ajaxchunk.storage[name].config[callback];
 	else if(typeof(window[ajaxchunk.storage[name].config[callback]])==='function')userCallback=window[ajaxchunk.storage[name].config[callback]];
 	return userCallback?userCallback:defaultCallback;
+};
+ajaxchunk.call = function(callback,name,options){
+	var f = ajaxchunk.getCallback(callback,name);
+	if(f)f.apply(ajaxchunk,options);
 };
